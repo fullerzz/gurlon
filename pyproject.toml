@@ -24,8 +24,45 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "boto3-stubs[essential]>=1.35.68",
+    "moto[dynamodb,s3]>=5.0.21",
     "mypy>=1.13.0",
     "pre-commit>=4.0.1",
     "pytest>=8.3.3",
     "ruff>=0.8.0",
+]
+
+[tool.uv]
+python-preference = "system"
+python-downloads = "manual"
+
+[tool.uv.pip]
+strict = true
+
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I", "N", "UP", "ASYNC", "S", "B", "ERA", "PLE", "PLW", "PERF", "RUF"]
+ignore = ["E501", "S101"]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = [
+    "--import-mode=importlib",
 ]
