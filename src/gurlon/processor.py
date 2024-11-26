@@ -19,4 +19,8 @@ class DataExporter:
         # Download data from S3
         download_dir = Path.home() / "Downloads" / "dynamodb_exports"
         self.bucket.download_export(download_dir)
+        # Now we have the exported data downloaded locally...
+        # Uncompress the downloaded files
+        # Optional: Validate the data
+        # Save as CSV or other format
         return "foo"
