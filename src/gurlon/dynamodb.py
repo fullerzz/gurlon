@@ -1,13 +1,37 @@
+# pyright: reportTypedDictNotRequiredAccess=false
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
 import boto3
+from botocore.exceptions import ClientError
+from mypy_boto3_dynamodb.type_defs import DescribeTableOutputTypeDef
 from pydantic import BaseModel
 
 
 class TableMetadata(BaseModel):
+    table_arn: str
     table_name: str
+    table_status: str
     primary_key: str
     sort_key: str | None = None
     total_items: int
     total_size_bytes: int
+
+
+def _build_table_metadata(data: DescribeTableOutputTypeDef) -> TableMetadata:
+    table = data["Table"]
+    try:
+        return TableMetadata(
+            table_arn=table["TableArn"],
+            table_name=table["TableName"],
+            table_status=table["TableStatus"],
+            primary_key=table["KeySchema"][0]["AttributeName"],
+            sort_key=table["KeySchema"][1]["AttributeName"] if len(table["KeySchema"]) > 1 else None,
+            total_items=table["ItemCount"],
+            total_size_bytes=table["TableSizeBytes"],
+        )
+    except (IndexError, KeyError) as e:
+        raise ValueError("Invalid table metadata") from e
 
 
 class DynamoTable:
@@ -19,13 +43,20 @@ class DynamoTable:
 
     def get_metadata(self) -> TableMetadata:
         response = self.client.describe_table(TableName=self.table_name)
-        table = response["Table"]
-        return TableMetadata(
-            table_name=table["TableName"],  # type: ignore
-            primary_key=table["KeySchema"][0]["AttributeName"],  # type: ignore
-            sort_key=table["KeySchema"][1]["AttributeName"]  # type: ignore
-            if len(table["KeySchema"]) > 1  # type: ignore
-            else None,
-            total_items=table["ItemCount"],  # type: ignore
-            total_size_bytes=table["TableSizeBytes"],  # type: ignore
-        )
+        return _build_table_metadata(response)
+
+    def export_to_s3(self, bucket: str, key_prefix: str = "") -> str:
+        try:
+            response = self.client.export_table_to_point_in_time(
+                TableArn=self.metadata.table_arn,
+                S3Bucket=bucket,
+                ExportTime=datetime.now(ZoneInfo("UTC")),
+                S3Prefix=key_prefix,
+                ExportFormat="DYNAMODB_JSON",
+                ExportType="FULL_EXPORT",
+            )
+            if response["ExportDescription"]["ExportStatus"] == "FAILED":
+                raise ValueError("Export failed")
+            return response["ExportDescription"]["ExportArn"]
+        except ClientError as e:
+            raise ValueError("Export failed") from e

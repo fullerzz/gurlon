@@ -124,6 +124,15 @@ def dynamodb_table(dynamodb: DynamoDBClient) -> str:
         TableClass="STANDARD",
         DeletionProtectionEnabled=False,
     )
+    # Once table exists, enable PITR
+    waiter = dynamodb.get_waiter("table_exists")
+    waiter.wait(TableName=table_name)
+    dynamodb.update_continuous_backups(
+        TableName=table_name,
+        PointInTimeRecoverySpecification={
+            "PointInTimeRecoveryEnabled": True,
+        },
+    )
     return table_name
 
 
