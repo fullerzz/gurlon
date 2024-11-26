@@ -35,10 +35,10 @@ def _build_table_metadata(data: DescribeTableOutputTypeDef) -> TableMetadata:
 
 
 class DynamoTable:
-    def __init__(self, table_name: str):
+    def __init__(self, table_name: str, region: str = "us-east-1") -> None:
         self.table_name = table_name
         # NOTE: This requires AWS credentials to be present locally by user
-        self.client = boto3.client("dynamodb")
+        self.client = boto3.client("dynamodb", region_name=region)
         self.metadata = self.get_metadata()
 
     def get_metadata(self) -> TableMetadata:
