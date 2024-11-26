@@ -10,9 +10,9 @@ class DataExporter:
         self.table: DynamoTable = DynamoTable(table_name, aws_region)
         self.bucket: S3Bucket = S3Bucket(bucket_name, aws_region)
 
-    def export_data(self) -> str:
+    def export_data(self, key_prefix: str = "gurlon") -> str:
         # Export DynamoDB table data to S3
-        export_arn = self.table.export_to_s3(self.bucket.bucket_name)
+        export_arn = self.table.export_to_s3(self.bucket.bucket_name, key_prefix)
         return export_arn
 
     def download_data(self) -> str:

@@ -46,7 +46,7 @@ class DynamoTable:
         return _build_table_metadata(response)
 
     # TODO: Handle cases when key_prefix is not provided as it must be at least 3 chars long
-    def export_to_s3(self, bucket: str, key_prefix: str = "") -> str:
+    def export_to_s3(self, bucket: str, key_prefix: str) -> str:
         try:
             response = self.client.export_table_to_point_in_time(
                 TableArn=self.metadata.table_arn,
