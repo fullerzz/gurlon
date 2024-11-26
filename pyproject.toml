@@ -24,8 +24,10 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "boto3-stubs[essential]>=1.35.68",
+    "faker>=33.0.0",
     "moto[dynamodb,s3]>=5.0.21",
     "mypy>=1.13.0",
+    "polyfactory>=2.18.1",
     "pre-commit>=4.0.1",
     "pytest>=8.3.3",
     "ruff>=0.8.0",
