@@ -16,8 +16,8 @@ def test_export_to_s3(populated_table: str, s3_bucket: str) -> None:
     assert export_arn.startswith("arn:aws:dynamodb:")
 
 
-def test_export_and_download(populated_table: str, s3_bucket: str) -> None:
-    exporter = processor.DataExporter(aws_region="us-east-1", table_name=populated_table, bucket_name=s3_bucket)
+def test_export_and_download(populated_table: str, populated_bucket: str) -> None:
+    exporter = processor.DataExporter(aws_region="us-east-1", table_name=populated_table, bucket_name=populated_bucket)
     export_arn = exporter.export_data()
     assert export_arn is not None
     assert export_arn == MOCK_EXPORT_ARN
