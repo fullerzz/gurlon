@@ -3,6 +3,7 @@ from collections.abc import Generator
 from pathlib import Path
 from typing import Any
 
+import duckdb
 import orjson
 import structlog
 from dynamodb_json import json_util
@@ -94,3 +95,26 @@ class DataExporter:
         with combined_data_path.open("wb") as f:
             f.write(orjson.dumps(combined_data, option=orjson.OPT_APPEND_NEWLINE))
         return combined_data_path
+
+
+class DataTransformer:
+    def __init__(self, combined_json_data: Path) -> None:
+        self.combined_data = combined_json_data
+
+    def to_parquet(self, output_path: Path | None = None) -> Path:
+        if output_path:
+            parquet_path = output_path
+        else:
+            parquet_path = self.combined_data.with_suffix(".parquet")
+        rel = duckdb.read_json(self.combined_data.as_posix())
+        rel.to_parquet(parquet_path.as_posix())
+        return parquet_path
+
+    def to_csv(self, output_path: Path | None = None) -> Path:
+        if output_path:
+            csv_path = output_path
+        else:
+            csv_path = self.combined_data.with_suffix(".csv")
+        rel = duckdb.read_json(self.combined_data.as_posix())
+        rel.to_csv(csv_path.as_posix())
+        return csv_path
