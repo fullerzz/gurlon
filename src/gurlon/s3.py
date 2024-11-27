@@ -67,11 +67,25 @@ class S3Bucket:
             raise ValueError("No exports found in bucket")
         print(resp["Contents"])
         # TODO: Extract export ID/key from resp then use it to download the manifest files
+        manifest_key: str | None = None
+        for obj in resp["Contents"]:
+            if obj["Key"].endswith("manifest-summary.json"):
+                manifest_key = obj["Key"]
+                break
+        if manifest_key is None:
+            raise ValueError("No manifest-summary.json found in bucket")
         self.client.download_file(
             Bucket=self.bucket_name,
-            Key=resp["Contents"][0]["Key"],  # TODO: Extract the key from the response
+            Key=manifest_key,  # TODO: Extract the key from the response
             # gurlon/AWSDynamoDB/01732662110643-26e512e8/manifest-files.json
-            Filename=download_dir / "manifest-summary.json",
+            Filename=(download_dir / "manifest-summary.json").as_posix(),
+        )
+        # Download manifest-files.json
+        self.client.download_file(
+            Bucket=self.bucket_name,
+            Key=manifest_key.replace("manifest-summary", "manifest-files", 1),
+            # gurlon/AWSDynamoDB/01732662110643-26e512e8/manifest-files.json
+            Filename=(download_dir / "manifest-files.json").as_posix(),
         )
         # Iterate over objects in Contents and download the manifest files
 
