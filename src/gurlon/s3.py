@@ -35,6 +35,7 @@ class ManifestSummary(BaseModel):
 class DynamoExport(BaseModel):
     arn: str
     local_data_dir: Path
+    local_data_files: list[Path]
     manifest_files: list[ManifestFile]
     manifest_summary: ManifestSummary
 
@@ -65,8 +66,6 @@ class S3Bucket:
         if "Contents" not in resp:
             print(resp)
             raise ValueError("No exports found in bucket")
-        print(resp["Contents"])
-        # TODO: Extract export ID/key from resp then use it to download the manifest files
         manifest_key: str | None = None
         for obj in resp["Contents"]:
             if obj["Key"].endswith("manifest-summary.json"):
@@ -76,8 +75,7 @@ class S3Bucket:
             raise ValueError("No manifest-summary.json found in bucket")
         self.client.download_file(
             Bucket=self.bucket_name,
-            Key=manifest_key,  # TODO: Extract the key from the response
-            # gurlon/AWSDynamoDB/01732662110643-26e512e8/manifest-files.json
+            Key=manifest_key,
             Filename=(download_dir / "manifest-summary.json").as_posix(),
         )
         # Download manifest-files.json
@@ -87,13 +85,22 @@ class S3Bucket:
             # gurlon/AWSDynamoDB/01732662110643-26e512e8/manifest-files.json
             Filename=(download_dir / "manifest-files.json").as_posix(),
         )
-        # Iterate over objects in Contents and download the manifest files
 
         manifest_summary = _parse_manifest_summary(download_dir / "manifest-summary.json")
         manifest_files = _parse_manifest_files(download_dir / "manifest-files.json")
+        local_data_files = []
+        for file in manifest_files:
+            filename = (download_dir / file.dataFileS3Key.split("/")[-1]).as_posix()
+            local_data_files.append(Path(filename))
+            self.client.download_file(
+                Bucket=self.bucket_name,
+                Key=file.dataFileS3Key,
+                Filename=filename,
+            )
         return DynamoExport(
             arn=table_export_arn,
             local_data_dir=download_dir,
+            local_data_files=local_data_files,
             manifest_files=manifest_files,
             manifest_summary=manifest_summary,
         )

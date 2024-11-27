@@ -1,7 +1,8 @@
+import gzip
 from pathlib import Path
 
 from gurlon.dynamodb import DynamoTable
-from gurlon.s3 import S3Bucket
+from gurlon.s3 import DynamoExport, S3Bucket
 
 
 class DataExporter:
@@ -24,9 +25,19 @@ class DataExporter:
         # Download data from S3
         download_dir = Path.home() / "Downloads" / "dynamodb_exports"
         download_dir.mkdir(exist_ok=True)
-        self.bucket.download_export(download_dir, self.table_export_arn, key_prefix=self.key_prefix)
+        export = self.bucket.download_export(download_dir, self.table_export_arn, self.key_prefix)
         # Now we have the exported data downloaded locally...
         # Uncompress the downloaded files
+        self.uncompress_data(export)
         # Optional: Validate the data
         # Save as CSV or other format
         return "foo"
+
+    def uncompress_data(self, export_metadata: DynamoExport) -> None:
+        # Uncompress the downloaded files
+        for data_file in export_metadata.local_data_files:
+            with gzip.open(data_file.as_posix(), "rb") as f:
+                content = f.read()
+            with Path(data_file.as_posix().replace(".gz", "")).open("wb") as f:
+                f.write(content)
+        pass
