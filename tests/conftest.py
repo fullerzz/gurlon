@@ -176,3 +176,10 @@ def populated_table(dynamodb_table: str, table_items: list[TableItem]) -> str:
         table.put_item(Item=item.model_dump())
     assert table.item_count == len(table_items)
     return table_name
+
+
+@pytest.fixture
+def populated_bucket(s3_bucket: str) -> str:
+    client = boto3.client("s3")
+    # TODO: Walk test data directory and upload files to mock S3 bucket
+    # S3 bucket root: tests/data/mock_export_contents
