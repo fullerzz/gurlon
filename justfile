@@ -13,3 +13,7 @@ populate-table: create-infra
 test-export: populate-table
     @echo "Running export integration test"
     uv run python tests/integration/export.py
+
+test-download:
+    @echo "Running download integration test"
+    uv run python tests/integration/download.py
