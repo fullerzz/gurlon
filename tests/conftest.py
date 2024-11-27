@@ -7,11 +7,16 @@ import pytest
 from faker import Faker
 from moto import mock_aws
 from mypy_boto3_dynamodb import DynamoDBClient
+from mypy_boto3_dynamodb.type_defs import ExportTableToPointInTimeOutputTypeDef
 from mypy_boto3_s3 import S3Client
 from polyfactory import Use
 from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory.pytest_plugin import register_fixture
 from pydantic import BaseModel
+
+from gurlon.dynamodb import DynamoTable
+
+MOCK_EXPORT_ARN = "arn:aws:dynamodb:us-west-1:863881196012:table/gurlon-table/export/01732662110643-26e512e8"
 
 
 class TableMetadata(BaseModel):
@@ -43,6 +48,33 @@ class TableItemFactory(ModelFactory[TableItem]):
 
 table_item_factory = register_fixture(TableItemFactory)
 table_metadata_factory = register_fixture(TableMetadataFactory)
+
+
+@pytest.fixture(autouse=True)
+def mock_export_pitr(monkeypatch: pytest.MonkeyPatch) -> None:
+    def mock_export_table_to_point_in_time(*args: Any, **kwargs: Any) -> str:
+        resp: ExportTableToPointInTimeOutputTypeDef = {
+            "ExportDescription": {
+                "ExportArn": MOCK_EXPORT_ARN,
+                "ExportStatus": "IN_PROGRESS",
+            },
+            "ResponseMetadata": {
+                "RequestId": "12345678901234567890123456789012",
+                "HTTPStatusCode": 200,
+                "HTTPHeaders": {
+                    "server": "Server",
+                    "date": "Mon, 01 Nov 2021 00:00:00 GMT",
+                    "content-type": "application/x-amz-json-1.0",
+                    "content-length": "123",
+                    "connection": "keep-alive",
+                    "x-amzn-requestid": "12345678901234567890123456789012",
+                },
+                "RetryAttempts": 0,
+            },
+        }
+        return resp["ExportDescription"]["ExportArn"]  # type: ignore
+
+    monkeypatch.setattr(DynamoTable, "export_to_s3", mock_export_table_to_point_in_time)
 
 
 @pytest.fixture(autouse=True)
