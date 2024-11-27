@@ -10,6 +10,8 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "boto3>=1.35.68",
+    "dynamodb-json>=1.4.2",
+    "orjson>=3.10.12",
     "pydantic>=2.10.1",
     "structlog>=24.4.0",
 ]
@@ -68,3 +70,14 @@ pythonpath = "src"
 addopts = [
     "--import-mode=importlib",
 ]
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = ["**/node_modules",
+    "**/__pycache__",
+    "typings",
+    "**/.venv",
+    ".venv"
+]
+reportMissingImports = "error"
+reportMissingTypeStubs = true
