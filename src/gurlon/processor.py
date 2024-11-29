@@ -7,6 +7,7 @@ import duckdb
 import orjson
 import structlog
 from dynamodb_json import json_util  # type: ignore
+from pydantic import BaseModel
 
 from gurlon.dynamodb import DynamoTable
 from gurlon.s3 import DynamoExport, S3Bucket
@@ -117,3 +118,6 @@ class DataTransformer:
         rel = duckdb.read_json(self.combined_data.as_posix())
         rel.to_csv(csv_path.as_posix())
         return csv_path
+
+    def to_sqlite(self, model: BaseModel) -> None:
+        pass
