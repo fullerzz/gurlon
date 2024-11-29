@@ -8,7 +8,7 @@ on:
 
 jobs:
   ruff-checks:
-    name: python
+    name: ruff
     runs-on: ubuntu-latest
 
     steps:
@@ -27,7 +27,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-            pip install uv==$UV_VERSION
             uv venv
             source .venv/bin/activate
             uv sync --locked

@@ -86,3 +86,6 @@ exclude = ["**/node_modules",
 ]
 reportMissingImports = "error"
 reportMissingTypeStubs = true
+
+[tool.mypy]
+strict = true
