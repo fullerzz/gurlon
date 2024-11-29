@@ -89,3 +89,4 @@ reportMissingTypeStubs = true
 
 [tool.mypy]
 strict = true
+exclude = "typings"
