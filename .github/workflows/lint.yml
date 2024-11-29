@@ -1,0 +1,67 @@
+name: CI Lint Checks
+
+on:
+    push:
+      branches: [ "*" ]
+    pull_request:
+      branches: [ "*" ]
+
+jobs:
+  ruff-checks:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.5"
+          enable-cache: true
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: |
+            pip install uv==$UV_VERSION
+            uv venv
+            source .venv/bin/activate
+            uv sync --locked
+      - name: Ruff linting and formatting check
+        run: |
+            source .venv/bin/activate
+            ruff check src/gurlon tests
+            ruff format --check src/gurlon tests
+
+  mypy:
+    name: python
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "0.5.5"
+          enable-cache: true
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Install dependencies
+        run: |
+            pip install uv==$UV_VERSION
+            uv venv
+            source .venv/bin/activate
+            uv sync --locked
+      - name: mypy static type checker
+        run: |
+            source .venv/bin/activate
+            mypy src/gurlon

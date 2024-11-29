@@ -42,15 +42,9 @@ jobs:
         uv venv
         source .venv/bin/activate
         uv sync --locked
-    - name: Ruff linting and formatting check
-      run: |
-        source .venv/bin/activate
-        ruff check src/gurlon tests
-        ruff format --check src/gurlon tests
     - name: Test with pytest
       run: |
         mkdir ~/.aws && touch ~/.aws/credentials && echo -e "[default]\naws_access_key_id = test\naws_secret_access_key = test" > ~/.aws/credentials
-        mv tests/testing.env .env
         source .venv/bin/activate
         pytest -v
     - name: Minimize uv cache
