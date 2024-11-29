@@ -32,8 +32,10 @@ dev = [
     "mypy>=1.13.0",
     "polyfactory>=2.18.1",
     "pre-commit>=4.0.1",
+    "pytest-sugar>=1.0.0",
     "pytest>=8.3.3",
     "ruff>=0.8.0",
+    "pytest-socket>=0.7.0",
 ]
 
 [tool.uv]
@@ -70,6 +72,8 @@ line-ending = "auto"
 pythonpath = "src"
 addopts = [
     "--import-mode=importlib",
+    "--disable-socket",
+    "--color=yes"
 ]
 
 [tool.pyright]
