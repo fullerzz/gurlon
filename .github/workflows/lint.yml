@@ -38,7 +38,7 @@ jobs:
             ruff format --check src/gurlon tests
 
   mypy:
-    name: python
+    name: mypy
     runs-on: ubuntu-latest
 
     steps:
@@ -57,7 +57,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-            pip install uv==$UV_VERSION
             uv venv
             source .venv/bin/activate
             uv sync --locked
