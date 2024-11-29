@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import pytest
+
 from gurlon import processor
 from tests.conftest import MOCK_EXPORT_ARN
 
@@ -32,3 +34,39 @@ def test_export_and_download(populated_table: str, populated_bucket: str, tmp_pa
     assert combined_path.stat().st_size > 0
     assert combined_path.parent.name == "dynamodb_exports"
     assert combined_path.name == "combined_data.json"
+
+
+@pytest.fixture
+def combined_data() -> bytes:
+    with Path("tests/data/expected/combined_data.json").open("rb") as input:
+        return input.read()
+
+
+@pytest.fixture
+def combined_data_path(tmp_path: Path, combined_data: bytes) -> Path:
+    data_path = tmp_path / "combined_data.json"
+    with data_path.open("wb") as output:
+        output.write(combined_data)
+    return data_path
+
+
+def test_transform_data_csv(combined_data_path: Path, tmp_path: Path) -> None:
+    transformer = processor.DataTransformer(combined_data_path)
+    output_path = tmp_path / "transformed_data.csv"
+    csv_path = transformer.to_csv(output_path)
+    assert csv_path.exists() is True
+    assert csv_path.is_file()
+    assert csv_path.suffix == ".csv"
+    assert csv_path.stat().st_size > 0
+    assert output_path == csv_path
+
+
+def test_transform_data_parquet(combined_data_path: Path, tmp_path: Path) -> None:
+    transformer = processor.DataTransformer(combined_data_path)
+    output_path = tmp_path / "transformed_data.parquet"
+    parquet_path = transformer.to_csv(output_path)
+    assert parquet_path.exists() is True
+    assert parquet_path.is_file()
+    assert parquet_path.suffix == ".parquet"
+    assert parquet_path.stat().st_size > 0
+    assert output_path == parquet_path
