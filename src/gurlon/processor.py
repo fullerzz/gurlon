@@ -31,11 +31,10 @@ class DataExporter:
         self.table_export_arn = self.table.export_to_s3(self.bucket.bucket_name, self.key_prefix)
         return self.table_export_arn
 
-    def download_data(self) -> Path:
+    def download_data(self, download_dir: Path) -> Path:
         if not self.table_export_arn:
             raise ValueError("No export ARN found. Run export_data first")
         # Download data from S3
-        download_dir = Path.home() / "Downloads" / "dynamodb_exports"
         download_dir.mkdir(exist_ok=True)
         log.debug(
             "Downloading data from S3",
