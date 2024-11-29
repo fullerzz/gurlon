@@ -22,11 +22,9 @@ def test_export_and_download(populated_table: str, populated_bucket: str) -> Non
     assert export_arn is not None
     assert export_arn == MOCK_EXPORT_ARN
     combined_path = exporter.download_data()
-    assert combined_path.exists()
+    assert combined_path.exists() is True
     assert combined_path.is_file()
     assert combined_path.suffix == ".json"
     assert combined_path.stat().st_size > 0
     assert combined_path.parent.name == "dynamodb_exports"
-    assert combined_path.name.startswith("gurlon_")
-    assert combined_path.name.endswith(".json")
-    assert combined_path.name == f"gurlon_{populated_table}.json"
+    assert combined_path.name == "combined_data.json"

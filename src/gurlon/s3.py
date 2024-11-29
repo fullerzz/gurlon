@@ -4,7 +4,10 @@ from datetime import datetime
 from pathlib import Path
 
 import boto3
+import structlog
 from pydantic import BaseModel
+
+log: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 
 class ManifestFile(BaseModel):
@@ -64,7 +67,6 @@ class S3Bucket:
         # First, need to find the latest export in the bucket
         resp = self.client.list_objects_v2(Bucket=self.bucket_name, Prefix=f"{key_prefix}/AWSDynamoDB/")
         if "Contents" not in resp:
-            print(resp)
             raise ValueError("No exports found in bucket")
         manifest_key: str | None = None
         for obj in resp["Contents"]:
@@ -78,25 +80,28 @@ class S3Bucket:
             Key=manifest_key,
             Filename=(download_dir / "manifest-summary.json").as_posix(),
         )
+        log.info("Downloaded manifest-summary.json")
         # Download manifest-files.json
         self.client.download_file(
             Bucket=self.bucket_name,
             Key=manifest_key.replace("manifest-summary", "manifest-files", 1),
-            # gurlon/AWSDynamoDB/01732662110643-26e512e8/manifest-files.json
             Filename=(download_dir / "manifest-files.json").as_posix(),
         )
+        log.info("Downloaded manifest-files.json")
 
         manifest_summary = _parse_manifest_summary(download_dir / "manifest-summary.json")
         manifest_files = _parse_manifest_files(download_dir / "manifest-files.json")
         local_data_files = []
         for file in manifest_files:
             filename = (download_dir / file.dataFileS3Key.split("/")[-1]).as_posix()
+            log.debug("Downloading data file", key=file.dataFileS3Key, filename=filename)
             local_data_files.append(Path(filename))
             self.client.download_file(
                 Bucket=self.bucket_name,
                 Key=file.dataFileS3Key,
                 Filename=filename,
             )
+            log.info("Downloaded data file", key=file.dataFileS3Key, filename=filename)
         return DynamoExport(
             arn=table_export_arn,
             local_data_dir=download_dir,

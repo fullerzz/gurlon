@@ -307,6 +307,8 @@ dev = [
     { name = "polyfactory" },
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "pytest-socket" },
+    { name = "pytest-sugar" },
     { name = "ruff" },
 ]
 
@@ -329,6 +331,8 @@ dev = [
     { name = "polyfactory", specifier = ">=2.18.1" },
     { name = "pre-commit", specifier = ">=4.0.1" },
     { name = "pytest", specifier = ">=8.3.3" },
+    { name = "pytest-socket", specifier = ">=0.7.0" },
+    { name = "pytest-sugar", specifier = ">=1.0.0" },
     { name = "ruff", specifier = ">=0.8.0" },
 ]
 
@@ -725,6 +729,32 @@ wheels = [
 ]
 
 [[package]]
+name = "pytest-socket"
+version = "0.7.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/05/ff/90c7e1e746baf3d62ce864c479fd53410b534818b9437413903596f81580/pytest_socket-0.7.0.tar.gz", hash = "sha256:71ab048cbbcb085c15a4423b73b619a8b35d6a307f46f78ea46be51b1b7e11b3", size = 12389 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/58/5d14cb5cb59409e491ebe816c47bf81423cd03098ea92281336320ae5681/pytest_socket-0.7.0-py3-none-any.whl", hash = "sha256:7e0f4642177d55d317bbd58fc68c6bd9048d6eadb2d46a89307fa9221336ce45", size = 6754 },
+]
+
+[[package]]
+name = "pytest-sugar"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "packaging" },
+    { name = "pytest" },
+    { name = "termcolor" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f5/ac/5754f5edd6d508bc6493bc37d74b928f102a5fff82d9a80347e180998f08/pytest-sugar-1.0.0.tar.gz", hash = "sha256:6422e83258f5b0c04ce7c632176c7732cab5fdb909cb39cca5c9139f81276c0a", size = 14992 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/92/fb/889f1b69da2f13691de09a111c16c4766a433382d44aa0ecf221deded44a/pytest_sugar-1.0.0-py3-none-any.whl", hash = "sha256:70ebcd8fc5795dc457ff8b69d266a4e2e8a74ae0c3edc749381c64b5246c8dfd", size = 10171 },
+]
+
+[[package]]
 name = "python-dateutil"
 version = "2.9.0.post0"
 source = { registry = "https://pypi.org/simple" }
@@ -892,6 +922,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/78/a3/e811a94ac3853826805253c906faa99219b79951c7d58605e89c79e65768/structlog-24.4.0.tar.gz", hash = "sha256:b27bfecede327a6d2da5fbc96bd859f114ecc398a6389d664f62085ee7ae6fc4", size = 1348634 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/bf/65/813fc133609ebcb1299be6a42e5aea99d6344afb35ccb43f67e7daaa3b92/structlog-24.4.0-py3-none-any.whl", hash = "sha256:597f61e80a91cc0749a9fd2a098ed76715a1c8a01f73e336b746504d1aad7610", size = 67180 },
+]
+
+[[package]]
+name = "termcolor"
+version = "2.5.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/37/72/88311445fd44c455c7d553e61f95412cf89054308a1aa2434ab835075fc5/termcolor-2.5.0.tar.gz", hash = "sha256:998d8d27da6d48442e8e1f016119076b690d962507531df4890fcd2db2ef8a6f", size = 13057 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7f/be/df630c387a0a054815d60be6a97eb4e8f17385d5d6fe660e1c02750062b4/termcolor-2.5.0-py3-none-any.whl", hash = "sha256:37b17b5fc1e604945c2642c872a3764b5d547a48009871aea3edd3afa180afb8", size = 7755 },
 ]
 
 [[package]]

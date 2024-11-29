@@ -182,8 +182,6 @@ def populated_table(dynamodb_table: str, table_items: list[TableItem]) -> str:
 @pytest.fixture
 def populated_bucket(s3_bucket: str) -> str:
     client = boto3.client("s3")
-    # TODO: Walk test data directory and upload files to mock S3 bucket
-    # S3 bucket root: tests/data/mock_export_contents
     prefix = "tests/data/mock_export_contents/"
     for root, _dirs, files in Path("tests/data/mock_export_contents").walk():
         for file in files:
@@ -193,5 +191,4 @@ def populated_bucket(s3_bucket: str) -> str:
                 Bucket=s3_bucket,
                 Key=key,
             )
-            print(f"Uploaded file: {file}")
     return s3_bucket
