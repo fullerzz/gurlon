@@ -73,7 +73,7 @@ def mock_export_pitr(monkeypatch: pytest.MonkeyPatch) -> None:
                 "RetryAttempts": 0,
             },
         }
-        return resp["ExportDescription"]["ExportArn"]  # type: ignore
+        return resp["ExportDescription"]["ExportArn"]  # pyright: ignore[reportTypedDictNotRequiredAccess]
 
     monkeypatch.setattr(DynamoTable, "export_to_s3", mock_export_table_to_point_in_time)
 
