@@ -40,7 +40,7 @@ dev = [
 
 [tool.uv]
 python-preference = "system"
-python-downloads = "manual"
+python-downloads = "automatic"
 
 [tool.uv.pip]
 strict = true
@@ -86,3 +86,7 @@ exclude = ["**/node_modules",
 ]
 reportMissingImports = "error"
 reportMissingTypeStubs = true
+
+[tool.mypy]
+strict = true
+exclude = "typings"

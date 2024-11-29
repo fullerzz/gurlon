@@ -6,7 +6,7 @@ from typing import Any
 import duckdb
 import orjson
 import structlog
-from dynamodb_json import json_util
+from dynamodb_json import json_util  # type: ignore
 
 from gurlon.dynamodb import DynamoTable
 from gurlon.s3 import DynamoExport, S3Bucket
@@ -79,7 +79,7 @@ class DataExporter:
         if self.decompressed_files == []:
             raise ValueError("No decompressed files found. Run decompress_data first")
 
-        combined_data: list[dict] = []
+        combined_data: list[dict[str, Any]] = []
         for row in self._read_raw_data():
             # Strip DynamoDB type markers from row
             item = json_util.loads(row)
