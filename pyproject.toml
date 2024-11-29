@@ -40,7 +40,7 @@ dev = [
 
 [tool.uv]
 python-preference = "system"
-python-downloads = "manual"
+python-downloads = "automatic"
 
 [tool.uv.pip]
 strict = true
