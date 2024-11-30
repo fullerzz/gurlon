@@ -17,3 +17,7 @@ test-export: populate-table
 test-download:
     @echo "Running download integration test"
     uv run python tests/integration/download.py
+
+test-transform: test-download
+    @echo "Running transform integration test"
+    uv run python tests/integration/transform.py
