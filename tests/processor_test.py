@@ -90,3 +90,14 @@ def test_transform_data_sqlmodel(combined_data_path: Path, tmp_path: Path) -> No
     assert sqlite_path.suffix == ".db"
     assert sqlite_path.stat().st_size > 0
     assert output_path == sqlite_path
+
+
+def test_transform_data_duckdb(combined_data_path: Path, tmp_path: Path) -> None:
+    transformer = processor.DataTransformer(combined_data_path)
+    output_path = tmp_path / "transformed_data.duckdb"
+    duckdb_path = transformer.to_csv(output_path)
+    assert duckdb_path.exists() is True
+    assert duckdb_path.is_file()
+    assert duckdb_path.suffix == ".duckdb"
+    assert duckdb_path.stat().st_size > 0
+    assert output_path == duckdb_path

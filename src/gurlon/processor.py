@@ -121,6 +121,17 @@ class DataTransformer:
         rel.to_csv(csv_path.as_posix())
         return csv_path
 
+    def to_duckdb(self, output_path: Path | None = None, table_name: str = "data") -> Path:
+        if output_path:
+            duckdb_path = output_path
+        else:
+            duckdb_path = self.combined_data.with_suffix(".duckdb")
+        con = duckdb.connect(duckdb_path.as_posix())
+        con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_json_auto('{self.combined_data.as_posix()}')")  # noqa: S608
+        con.table(table_name).show()
+        con.close()
+        return duckdb_path
+
     def to_sqlite(self, model: BaseModel) -> None:
         pass
 

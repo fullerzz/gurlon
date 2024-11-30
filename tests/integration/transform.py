@@ -18,11 +18,12 @@ class UserSqlModel(SQLModel, table=True):
     full_name: str
 
 
-def log_output(parquet: Path, csv: Path, sql: Path) -> None:
+def log_output(*, parquet: Path, csv: Path, sql: Path, duckdb: Path) -> None:
     outputs = {
         "Parquet": parquet.as_posix(),
         "CSV": csv.as_posix(),
         "SQLite": sql.as_posix(),
+        "DuckDB": duckdb.as_posix(),
     }
     syntax = Syntax(json.dumps(outputs, indent=2), "json", theme="lightbulb")
     console = Console()
@@ -38,7 +39,8 @@ def main() -> None:
     parquet = transformer.to_parquet()
     csv = transformer.to_csv()
     sql = transformer.to_sqlmodel(UserSqlModel)
-    log_output(parquet, csv, sql)
+    duckdb = transformer.to_duckdb()
+    log_output(parquet=parquet, csv=csv, sql=sql, duckdb=duckdb)
 
 
 if __name__ == "__main__":
