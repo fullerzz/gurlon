@@ -7,6 +7,9 @@ import duckdb
 import orjson
 import structlog
 from dynamodb_json import json_util  # type: ignore
+from pydantic import BaseModel
+from sqlalchemy import Engine
+from sqlmodel import Session, SQLModel, create_engine
 
 from gurlon.dynamodb import DynamoTable
 from gurlon.s3 import DynamoExport, S3Bucket
@@ -117,3 +120,47 @@ class DataTransformer:
         rel = duckdb.read_json(self.combined_data.as_posix())
         rel.to_csv(csv_path.as_posix())
         return csv_path
+
+    def to_duckdb(self, output_path: Path | None = None, table_name: str = "data") -> Path:
+        if output_path:
+            duckdb_path = output_path
+        else:
+            duckdb_path = self.combined_data.with_suffix(".duckdb")
+        con = duckdb.connect(duckdb_path.as_posix())
+        con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_json_auto('{self.combined_data.as_posix()}')")  # noqa: S608
+        con.table(table_name).show()
+        con.close()
+        return duckdb_path
+
+    def to_sqlite(self, model: BaseModel) -> None:
+        pass
+
+    def to_sqlmodel(self, model_cls: type[SQLModel], output_path: Path | None = None) -> Path:
+        if output_path:
+            sqlite_path = output_path
+        else:
+            sqlite_path = self.combined_data.with_suffix(".db")
+
+        engine = self._create_sql_table(sqlite_path)
+        with Session(engine) as session:
+            self._populate_sql_table(model_cls, session)
+        return sqlite_path
+
+    def _create_sql_table(self, sqlite_path: Path) -> Engine:
+        engine = create_engine(f"sqlite:///{sqlite_path.as_posix()}", echo=True)
+        SQLModel.metadata.create_all(engine)
+        return engine
+
+    def _populate_sql_table(self, model: type[SQLModel], session: Session) -> None:
+        # Read in the combined data using the path stored in self.combined_data
+        with self.combined_data.open("rb") as f:
+            table_items: list[dict[str, Any]] = orjson.loads(f.read())
+        log.info("Read table items into memory", num_items=len(table_items))
+
+        # Insert the data into the SQL table
+        log.info("Iterating over table items and inserting into SQL table")
+        for item in table_items:
+            session.add(model(**item))
+
+        session.commit()
+        log.info("Data inserted into SQL table")
