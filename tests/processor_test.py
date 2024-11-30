@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from sqlmodel import Field, SQLModel
 
 from gurlon import processor
 from tests.conftest import MOCK_EXPORT_ARN
@@ -70,3 +71,22 @@ def test_transform_data_parquet(combined_data_path: Path, tmp_path: Path) -> Non
     assert parquet_path.suffix == ".parquet"
     assert parquet_path.stat().st_size > 0
     assert output_path == parquet_path
+
+
+def test_transform_data_sqlmodel(combined_data_path: Path, tmp_path: Path) -> None:
+    class UserSqlModel(SQLModel, table=True):
+        id: int | None = Field(default=None, primary_key=True)
+        user_id: str
+        user_name: str
+        email: str
+        role: str
+        full_name: str
+
+    transformer = processor.DataTransformer(combined_data_path)
+    output_path = tmp_path / "gurlon-sqlite.db"
+    sqlite_path = transformer.to_sqlmodel(UserSqlModel, output_path)
+    assert sqlite_path.exists() is True
+    assert sqlite_path.is_file()
+    assert sqlite_path.suffix == ".db"
+    assert sqlite_path.stat().st_size > 0
+    assert output_path == sqlite_path
