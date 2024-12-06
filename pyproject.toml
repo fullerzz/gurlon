@@ -82,6 +82,9 @@ addopts = [
     "--disable-socket",
     "--color=yes"
 ]
+markers = [
+    "no_mock_export_pitr: Disable mock export PITR autouse fixture",
+]
 
 [tool.pyright]
 include = ["src", "tests"]
@@ -91,6 +94,7 @@ exclude = ["**/node_modules",
     "**/.venv",
     ".venv"
 ]
+typeCheckingMode = "standard"
 reportMissingImports = "error"
 reportMissingTypeStubs = true
 
