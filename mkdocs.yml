@@ -1,11 +1,7 @@
 site_name: Gurlon Docs
 
 nav:
-  - Home: index.md
-  - Usage:
-    - Export Data from DynamoDB: usage/export.md
-    - Download Data: usage/download.md
-    - Transform Data: usage/transform.md
+  - Usage: index.md
 
 theme:
   name: material
