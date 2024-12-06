@@ -21,3 +21,6 @@ test-download:
 test-transform: test-download
     @echo "Running transform integration test"
     uv run python tests/integration/transform.py
+
+serve-docs:
+    uv run mkdocs serve

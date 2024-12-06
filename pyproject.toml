@@ -39,10 +39,15 @@ dev = [
     "pytest-socket>=0.7.0",
     "rich>=13.9.4",
 ]
+docs = [
+    "mkdocs-glightbox>=0.4.0",
+    "mkdocs-material>=9.5.47",
+]
 
 [tool.uv]
 python-preference = "system"
 python-downloads = "automatic"
+default-groups = ["dev", "docs"]
 
 [tool.uv.pip]
 strict = true
