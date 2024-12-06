@@ -45,8 +45,10 @@ class DynamoTable:
         response = self.client.describe_table(TableName=self.table_name)
         return _build_table_metadata(response)
 
-    # TODO: Handle cases when key_prefix is not provided as it must be at least 3 chars long
     def export_to_s3(self, bucket: str, key_prefix: str) -> str:
+        if len(key_prefix) < 3:
+            raise ValueError("Key prefix must be at least 3 characters long")
+
         try:
             response = self.client.export_table_to_point_in_time(
                 TableArn=self.metadata.table_arn,
@@ -56,8 +58,10 @@ class DynamoTable:
                 ExportFormat="DYNAMODB_JSON",
                 ExportType="FULL_EXPORT",
             )
-            if response["ExportDescription"]["ExportStatus"] == "FAILED":
-                raise ValueError("Export failed")
-            return response["ExportDescription"]["ExportArn"]
         except ClientError as e:
             raise ValueError("Export failed") from e
+
+        if response["ExportDescription"]["ExportStatus"] == "FAILED":
+            raise ValueError("Export failed")
+
+        return response["ExportDescription"]["ExportArn"]

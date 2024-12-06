@@ -52,7 +52,7 @@ table_metadata_factory = register_fixture(TableMetadataFactory)
 
 
 @pytest.fixture(autouse=True)
-def mock_export_pitr(monkeypatch: pytest.MonkeyPatch) -> None:
+def mock_export_pitr(monkeypatch: pytest.MonkeyPatch, request: pytest.FixtureRequest) -> None:
     def mock_export_table_to_point_in_time(*args: Any, **kwargs: Any) -> str:
         resp: ExportTableToPointInTimeOutputTypeDef = {
             "ExportDescription": {
@@ -75,6 +75,8 @@ def mock_export_pitr(monkeypatch: pytest.MonkeyPatch) -> None:
         }
         return resp["ExportDescription"]["ExportArn"]  # pyright: ignore[reportTypedDictNotRequiredAccess]
 
+    if "no_mock_export_pitr" in request.keywords:
+        return  # Don't monkeypatch if test has marker 'no_mock_export_pitr
     monkeypatch.setattr(DynamoTable, "export_to_s3", mock_export_table_to_point_in_time)
 
 
