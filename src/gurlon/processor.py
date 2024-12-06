@@ -18,12 +18,19 @@ log: structlog.stdlib.BoundLogger = structlog.get_logger()
 
 
 class DataExporter:
-    def __init__(self, aws_region: str, table_name: str, bucket_name: str, key_prefix: str = "gurlon") -> None:
+    def __init__(
+        self,
+        aws_region: str,
+        table_name: str,
+        bucket_name: str,
+        table_export_arn: str | None = None,
+        key_prefix: str = "gurlon",
+    ) -> None:
         log.debug("Initializing DataExporter", aws_region=aws_region, table_name=table_name, bucket_name=bucket_name)
         self.aws_region = aws_region
         self.table: DynamoTable = DynamoTable(table_name, aws_region)
         self.bucket: S3Bucket = S3Bucket(bucket_name, aws_region)
-        self.table_export_arn: str | None = None
+        self.table_export_arn: str | None = table_export_arn
         self.key_prefix = key_prefix
         self.export_metadata: DynamoExport | None = None
         self.decompressed_files: list[Path] = []
