@@ -1,5 +1,11 @@
 site_name: Gurlon Docs
-
+copyright: Copyright &copy; 2024 Zach Fuller
+extra:
+  social:
+      - icon: fontawesome/brands/github
+        link: https://github.com/fullerzz/gurlon
+repo_url: https://github.com/fullerzz/gurlon
+repo_name: fullerzz/gurlon
 nav:
   - Usage: index.md
 
