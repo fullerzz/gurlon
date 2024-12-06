@@ -1,5 +1,6 @@
 site_name: Gurlon Docs
 copyright: Copyright &copy; 2024 Zach Fuller
+site_url: https://fullerzz.github.io/gurlon/
 extra:
   social:
       - icon: fontawesome/brands/github
