@@ -38,6 +38,7 @@ dev = [
     "ruff>=0.8.0",
     "pytest-socket>=0.7.0",
     "rich>=13.9.4",
+    "pytest-cov>=6.0.0",
 ]
 docs = [
     "mkdocs-glightbox>=0.4.0",
@@ -80,7 +81,8 @@ pythonpath = "src"
 addopts = [
     "--import-mode=importlib",
     "--disable-socket",
-    "--color=yes"
+    "--color=yes",
+    "--cov=src/gurlon",
 ]
 markers = [
     "no_mock_export_pitr: Disable mock export PITR autouse fixture",
