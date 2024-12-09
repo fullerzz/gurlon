@@ -1,5 +1,6 @@
 import gzip
 from collections.abc import Generator
+from multiprocessing import Process
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,15 @@ from gurlon.dynamodb import DynamoTable
 from gurlon.s3 import DynamoExport, S3Bucket
 
 log: structlog.stdlib.BoundLogger = structlog.get_logger()
+
+
+def _decompress_file(compressed_data_path: str) -> None:
+    log.debug("Decompressing file", local_path=compressed_data_path)
+    with gzip.open(compressed_data_path, "rb") as f:
+        content = f.read()
+    decompressed_file = Path(compressed_data_path.replace(".gz", ""))
+    with decompressed_file.open("wb") as f:
+        f.write(content)
 
 
 class DataExporter:
@@ -66,14 +76,23 @@ class DataExporter:
         if not self.export_metadata:
             raise ValueError("No export metadata found. Run download_data first")
         log.debug("Decompressing downloaded data", local_dir=self.export_metadata.local_data_dir)
-        # Uncompress the downloaded files
+
+        # Kick off a process for each compressed file
+        procs: list[Process] = []
         for data_file in self.export_metadata.local_data_files:
-            log.debug("Decompressing file", file=data_file)
-            with gzip.open(data_file.as_posix(), "rb") as f:
-                content = f.read()
+            p = Process(target=_decompress_file, args=(data_file.as_posix(),))
+            procs.append(p)
+            procs[-1].start()
+
+        # Block until all files decompressed
+        for proc in procs:
+            proc.join()
+
+        # Validate for each compressed file there is now a decompressed file
+        for data_file in self.export_metadata.local_data_files:
             decompressed_file = Path(data_file.as_posix().replace(".gz", ""))
-            with decompressed_file.open("wb") as f:
-                f.write(content)
+            if decompressed_file.exists() is False:
+                raise ValueError("Unable to locate decompressed file")
             self.decompressed_files.append(decompressed_file)
 
     def _read_raw_data(self) -> Generator[str, Any, None]:
