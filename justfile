@@ -24,3 +24,8 @@ test-transform: test-download
 
 serve-docs:
     uv run mkdocs serve
+
+create-cov-report:
+    @echo "Creating coverage report"
+    uv run pytest --cov-report=html
+    open htmlcov/index.html
