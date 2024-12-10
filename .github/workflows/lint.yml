@@ -29,7 +29,7 @@ jobs:
         run: |
             uv venv
             source .venv/bin/activate
-            uv sync --locked
+            uv sync --frozen
       - name: Ruff linting and formatting check
         run: |
             source .venv/bin/activate
@@ -58,7 +58,7 @@ jobs:
         run: |
             uv venv
             source .venv/bin/activate
-            uv sync --locked
+            uv sync --frozen
       - name: mypy static type checker
         run: |
             source .venv/bin/activate

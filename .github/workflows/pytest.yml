@@ -41,7 +41,7 @@ jobs:
         pip install uv==$UV_VERSION
         uv venv
         source .venv/bin/activate
-        uv sync --locked
+        uv sync --frozen
     - name: Test with pytest
       run: |
         mkdir ~/.aws && touch ~/.aws/credentials && echo -e "[default]\naws_access_key_id = test\naws_secret_access_key = test" > ~/.aws/credentials
