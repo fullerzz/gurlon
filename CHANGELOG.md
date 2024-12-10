@@ -1,3 +1,9 @@
+## v0.2.1 (2024-12-10)
+
+### Fix
+
+- **ci**: updated uv sync --locked to uv sync --frozen
+
 ## v0.2.0 (2024-12-09)
 
 ### Feat
