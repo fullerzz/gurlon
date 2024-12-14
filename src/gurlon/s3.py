@@ -44,12 +44,14 @@ class DynamoExport(BaseModel):
 
 
 def _parse_manifest_summary(path: Path) -> ManifestSummary:
+    log.debug("Parsing manifest-summary.json", path=path)
     with path.open("r") as f:
         manifest_summary = ManifestSummary.model_validate_json(f.read())
     return manifest_summary
 
 
 def _parse_manifest_files(path: Path) -> list[ManifestFile]:
+    log.debug("Parsing manifest-files.json", path=path)
     manifest_files: list[ManifestFile] = []
     with path.open("r") as f:
         for line in f.readlines():
@@ -62,6 +64,7 @@ class S3Bucket:
         self.bucket_name = bucket_name
         # NOTE: This requires AWS credentials to be present locally by user
         self.client = boto3.client("s3", region_name=aws_region)
+        log.debug("Initialized S3Bucket", bucket_name=bucket_name, aws_region=aws_region)
 
     def download_export(self, download_dir: Path, table_export_arn: str, key_prefix: str) -> DynamoExport:
         # First, need to find the latest export in the bucket
