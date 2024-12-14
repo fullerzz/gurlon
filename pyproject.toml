@@ -1,6 +1,6 @@
 [project]
 name = "gurlon"
-version = "0.2.1"
+version = "0.3.0"
 description = "Transform unstructured DynamoDB data into local SQL tables."
 readme = "README.md"
 license = "MIT"

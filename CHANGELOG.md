@@ -1,3 +1,13 @@
+## v0.3.0 (2024-12-14)
+
+### Feat
+
+- **logging**: add debug and info logs for S3, DynamoDB, and DataTransformer operations
+
+### Fix
+
+- **python-deps**: upgraded python dependencies with uv sync --upgrade
+
 ## v0.2.1 (2024-12-10)
 
 ### Fix
