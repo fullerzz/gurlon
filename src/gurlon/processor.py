@@ -44,6 +44,7 @@ class DataExporter:
         self.key_prefix = key_prefix
         self.export_metadata: DynamoExport | None = None
         self.decompressed_files: list[Path] = []
+        log.debug("DataExporter initialized", table_name=self.table.table_name, bucket_name=self.bucket.bucket_name)
 
     def export_data(self) -> str:
         log.debug("Exporting data to S3", table_name=self.table.table_name, bucket_name=self.bucket.bucket_name)
@@ -108,6 +109,7 @@ class DataExporter:
             raise ValueError("No decompressed files found. Run decompress_data first")
 
         combined_data: list[dict[str, Any]] = []
+        log.debug("Preparing to read uncompressed data and strip DynamoDB type markers")
         for row in self._read_raw_data():
             # Strip DynamoDB type markers from row
             item = json_util.loads(row)
@@ -145,6 +147,7 @@ class DataTransformer:
             csv_path = self.combined_data.with_suffix(".csv")
         rel = duckdb.read_json(self.combined_data.as_posix())
         rel.to_csv(csv_path.as_posix())
+        log.info("Data written to CSV", csv_path=csv_path)
         return csv_path
 
     def to_duckdb(self, output_path: Path | None = None, table_name: str = "data") -> Path:
@@ -156,6 +159,7 @@ class DataTransformer:
         con.execute(f"CREATE TABLE {table_name} AS SELECT * FROM read_json_auto('{self.combined_data.as_posix()}')")  # noqa: S608
         con.table(table_name).show()
         con.close()
+        log.info("Data written to DuckDB database", duckdb_path=duckdb_path)
         return duckdb_path
 
     def to_sqlite(self, model: BaseModel) -> None:
@@ -170,6 +174,7 @@ class DataTransformer:
         engine = self._create_sql_table(sqlite_path)
         with Session(engine) as session:
             self._populate_sql_table(model_cls, session)
+        log.info("Data written to SQLite database", sqlite_path=sqlite_path)
         return sqlite_path
 
     def _create_sql_table(self, sqlite_path: Path) -> Engine:
@@ -181,12 +186,11 @@ class DataTransformer:
         # Read in the combined data using the path stored in self.combined_data
         with self.combined_data.open("rb") as f:
             table_items: list[dict[str, Any]] = orjson.loads(f.read())
-        log.info("Read table items into memory", num_items=len(table_items))
+        log.debug("Read table items into memory", num_items=len(table_items))
 
         # Insert the data into the SQL table
-        log.info("Iterating over table items and inserting into SQL table")
+        log.debug("Iterating over table items and inserting into SQL table")
         for item in table_items:
             session.add(model(**item))
 
         session.commit()
-        log.info("Data inserted into SQL table")
